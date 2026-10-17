@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Tim Hạt ♥</title>
+
+  <!-- Toàn bộ CSS nằm ở file riêng -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. Canvas full màn hình: Three.js vẽ trái tim hạt vào đây -->
+  <canvas id="scene"></canvas>
+
+  <!-- 2. Gợi ý mờ, nhỏ: chạm để phát nhạc (chỉ hiện lúc mới vào) -->
+  <div id="tapHint" class="hint">Chạm để phát nhạc</div>
+
+  <!-- 3. Thông báo nhỏ gần nút nhạc (chỉ hiện khi thật sự có lỗi) -->
+  <div id="msg" class="msg" role="status" aria-live="polite"></div>
+
+  <!-- 4. Nút ♪ duy nhất ở góc dưới bên phải: bật/tắt nhạc -->
+  <button id="musicToggle" class="music-btn" type="button"
+          aria-label="Bật nhạc" aria-pressed="false" title="Bật / tắt nhạc">&#9834;</button>
+
+  <!-- 5. MỘT bài nhạc duy nhất, phát lặp vô hạn -->
+  <audio id="player" src="music/song.mp3" loop preload="auto" hidden></audio>
+
+  <!-- 6. Three.js r128 từ CDN — BẮT BUỘC đặt TRƯỚC script.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- 7. Toàn bộ logic của trang -->
+  <script src="script.js"></script>
+</body>
+</html>

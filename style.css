@@ -1,0 +1,173 @@
+/* =========================================================
+   TRÁI TIM HẠT — nền đen, nút nhạc ♪
+   Toàn bộ CSS: nền, gợi ý, thông báo, nút nhạc, responsive
+   ========================================================= */
+
+:root {
+  --pink:       #ff5fa2;   /* hồng sen */
+  --pink-soft:  #ffd9e6;   /* hồng rất nhạt */
+  --pink-deep:  #ff2e7e;   /* hồng đậm */
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: #000;              /* nền đen thuần */
+  color: #fff;
+  overflow: hidden;
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Canvas full màn hình ---------- */
+#scene {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;            /* tắt cuộn/zoom để kéo xoay mượt */
+}
+
+/* ---------- Gợi ý mờ: "Chạm để phát nhạc" (ngay trên nút ♪) ---------- */
+.hint {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  z-index: 6;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: rgba(255, 217, 230, 0.8);
+
+  background: rgba(255, 46, 126, 0.08);
+  border: 1px solid rgba(255, 95, 162, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  pointer-events: none;
+  animation: hintPulse 2.4s ease-in-out infinite;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+
+.hint.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: .42; transform: translateY(0); }
+  50%      { opacity: .80; transform: translateY(-2px); }
+}
+
+/* ---------- Thông báo nhỏ (chỉ khi có lỗi thật) ---------- */
+.msg {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+  z-index: 6;
+
+  max-width: min(260px, 70vw);
+  font-size: 11.5px;
+  line-height: 1.35;
+  text-align: right;
+  color: #ff9fbe;
+  text-shadow: 0 0 8px rgba(255, 46, 126, 0.6);
+}
+
+.msg:empty { display: none; }
+
+/* ---------- Nút nhạc ♪ (góc dưới bên phải) ---------- */
+.music-btn {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 7;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+  line-height: 1;
+  color: var(--pink-soft);
+  cursor: pointer;
+
+  border-radius: 50%;
+  border: 1px solid rgba(255, 95, 162, 0.55);
+  background: radial-gradient(circle at 30% 25%, rgba(255, 95, 162, 0.28), rgba(30, 0, 14, 0.55));
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow:
+    0 0 14px rgba(255, 95, 162, 0.40),
+    inset 0 0 12px rgba(255, 95, 162, 0.12);
+
+  transition: transform .2s ease, box-shadow .2s ease, color .2s ease, background .2s ease, opacity .2s ease;
+}
+
+.music-btn:hover,
+.music-btn:focus-visible {
+  color: #fff;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 95, 162, 0.60), rgba(120, 0, 50, 0.65));
+  box-shadow: 0 0 18px var(--pink), 0 0 34px rgba(255, 46, 126, 0.7);
+  outline: none;
+}
+
+.music-btn:active { transform: scale(0.92); }
+
+/* Nhạc đang phát: nút nhấp nháy nhẹ */
+.music-btn.is-playing { animation: musicPulse 1.6s ease-in-out infinite; }
+
+@keyframes musicPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 14px rgba(255, 95, 162, 0.40), inset 0 0 12px rgba(255, 95, 162, 0.12);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 26px var(--pink), 0 0 46px rgba(255, 46, 126, 0.8);
+  }
+}
+
+/* Khi nhạc đang tắt: mờ hơn + gạch chéo nhẹ */
+.music-btn.is-off { opacity: 0.72; }
+
+.music-btn.is-off::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 217, 230, 0.85);
+  box-shadow: 0 0 6px rgba(255, 95, 162, 0.8);
+  transform: rotate(-45deg);
+}
+
+/* ---------- Responsive cho điện thoại ---------- */
+@media (max-width: 480px) {
+  .hint {
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    font-size: 11px;
+    padding: 6px 11px;
+  }
+
+  .msg {
+    font-size: 11px;
+    max-width: 62vw;
+  }
+}
+
+/* Người dùng bật "giảm chuyển động" */
+@media (prefers-reduced-motion: reduce) {
+  .hint { animation: none; opacity: .6; }
+  .music-btn.is-playing { animation: none; }
+}
