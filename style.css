@@ -1,12 +1,21 @@
 /* =========================================================
-   TRÁI TIM HẠT — nền đen, nút nhạc ♪
-   Toàn bộ CSS: nền, gợi ý, thông báo, nút nhạc, responsive
+   TRÁI TIM HẠT — nền đêm ấm
+   Toàn bộ CSS: nền, canvas, quầng sáng, thông báo, responsive
    ========================================================= */
 
 :root {
   --pink:       #ff5fa2;   /* hồng sen */
   --pink-soft:  #ffd9e6;   /* hồng rất nhạt */
   --pink-deep:  #ff2e7e;   /* hồng đậm */
+
+  /* --- NỀN ĐÊM ẤM: đổi 3 màu dưới đây là đổi cả nền --- */
+  --bg-center:  #4a0f3a;   /* tâm (tím mận) — nằm ngay sau trái tim */
+  --bg-mid:     #2a0824;   /* giữa (tím mận tối) */
+  --bg-edge:    #120212;   /* rìa (tím đen ấm) */
+
+  /* --- Quầng sáng hồng sau trái tim --- */
+  --glow-soft:  rgba(255, 95, 162, 0.55);
+  --glow-mid:   rgba(255, 46, 126, 0.22);
 }
 
 * { box-sizing: border-box; }
@@ -15,7 +24,13 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: #000;              /* nền đen thuần */
+  /* Gradient HƯỚNG TÂM từ giữa ra rìa (tâm nằm ngay sau trái tim) */
+  background:
+    radial-gradient(circle at 50% 50%,
+      var(--bg-center) 0%,
+      var(--bg-mid) 45%,
+      var(--bg-edge) 100%);
+  background-attachment: fixed;
   color: #fff;
   overflow: hidden;
   font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
@@ -23,50 +38,35 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Canvas full màn hình ---------- */
+/* ---------- Canvas full màn hình (nền trong suốt để thấy gradient phía sau) ---------- */
 #scene {
   position: fixed;
   inset: 0;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
+  background: transparent;       /* KHÔNG tô nền trong canvas */
   touch-action: none;            /* tắt cuộn/zoom để kéo xoay mượt */
 }
 
-/* ---------- Gợi ý mờ: "Chạm để phát nhạc" (ngay trên nút ♪) ---------- */
-.hint {
+/* ---------- Quầng sáng hồng sau trái tim (JS cho "thở" theo nhịp) ---------- */
+.glow {
   position: fixed;
-  right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
-  z-index: 6;
-
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  letter-spacing: 0.05em;
-  color: rgba(255, 217, 230, 0.8);
-
-  background: rgba(255, 46, 126, 0.08);
-  border: 1px solid rgba(255, 95, 162, 0.25);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
+  inset: 0;
+  z-index: 0;                    /* nằm SAU canvas */
   pointer-events: none;
-  animation: hintPulse 2.4s ease-in-out infinite;
-  transition: opacity .5s ease, visibility .5s ease;
+  opacity: 0.15;                 /* JS điều chỉnh mỗi frame; đây là mức tĩnh ban đầu */
+  will-change: opacity;
+  background:
+    radial-gradient(circle at 50% 50%,
+      var(--glow-soft) 0%,
+      var(--glow-mid) 22%,
+      rgba(255, 46, 126, 0) 55%);
 }
 
-.hint.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-}
 
-@keyframes hintPulse {
-  0%, 100% { opacity: .42; transform: translateY(0); }
-  50%      { opacity: .80; transform: translateY(-2px); }
-}
-
-/* ---------- Thông báo nhỏ (chỉ khi có lỗi thật) ---------- */
+/* ---------- Thông báo nhỏ (chỉ dùng khi không tải được Three.js) ---------- */
 .msg {
   position: fixed;
   right: calc(16px + env(safe-area-inset-right, 0px));
@@ -83,91 +83,10 @@ body {
 
 .msg:empty { display: none; }
 
-/* ---------- Nút nhạc ♪ (góc dưới bên phải) ---------- */
-.music-btn {
-  position: fixed;
-  right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  z-index: 7;
-
-  width: 44px;
-  height: 44px;
-  padding: 0;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 17px;
-  line-height: 1;
-  color: var(--pink-soft);
-  cursor: pointer;
-
-  border-radius: 50%;
-  border: 1px solid rgba(255, 95, 162, 0.55);
-  background: radial-gradient(circle at 30% 25%, rgba(255, 95, 162, 0.28), rgba(30, 0, 14, 0.55));
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  box-shadow:
-    0 0 14px rgba(255, 95, 162, 0.40),
-    inset 0 0 12px rgba(255, 95, 162, 0.12);
-
-  transition: transform .2s ease, box-shadow .2s ease, color .2s ease, background .2s ease, opacity .2s ease;
-}
-
-.music-btn:hover,
-.music-btn:focus-visible {
-  color: #fff;
-  background: radial-gradient(circle at 30% 25%, rgba(255, 95, 162, 0.60), rgba(120, 0, 50, 0.65));
-  box-shadow: 0 0 18px var(--pink), 0 0 34px rgba(255, 46, 126, 0.7);
-  outline: none;
-}
-
-.music-btn:active { transform: scale(0.92); }
-
-/* Nhạc đang phát: nút nhấp nháy nhẹ */
-.music-btn.is-playing { animation: musicPulse 1.6s ease-in-out infinite; }
-
-@keyframes musicPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 14px rgba(255, 95, 162, 0.40), inset 0 0 12px rgba(255, 95, 162, 0.12);
-  }
-  50% {
-    transform: scale(1.06);
-    box-shadow: 0 0 26px var(--pink), 0 0 46px rgba(255, 46, 126, 0.8);
-  }
-}
-
-/* Khi nhạc đang tắt: mờ hơn + gạch chéo nhẹ */
-.music-btn.is-off { opacity: 0.72; }
-
-.music-btn.is-off::after {
-  content: "";
-  position: absolute;
-  width: 24px;
-  height: 1px;
-  background: rgba(255, 217, 230, 0.85);
-  box-shadow: 0 0 6px rgba(255, 95, 162, 0.8);
-  transform: rotate(-45deg);
-}
-
 /* ---------- Responsive cho điện thoại ---------- */
 @media (max-width: 480px) {
-  .hint {
-    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
-    font-size: 11px;
-    padding: 6px 11px;
-  }
-
   .msg {
     font-size: 11px;
     max-width: 62vw;
   }
-}
-
-/* Người dùng bật "giảm chuyển động" */
-@media (prefers-reduced-motion: reduce) {
-  .hint { animation: none; opacity: .6; }
-  .music-btn.is-playing { animation: none; }
 }
